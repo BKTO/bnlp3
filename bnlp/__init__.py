@@ -899,27 +899,28 @@ def generateWordsForSameSubject(subject):
 #getStatementsFromText(text)
 
 def get_info_from_match_group(m):
-    location = m.group(1)
+    location = m.group(1).title()
+    if isLocation(location):
 
-    text = m.string
-    start = m.start()
-    end = m.end()
+        text = m.string
+        start = m.start()
+        end = m.end()
 
-    before = text[:start]
-    after = text[end:]
+        before = text[:start]
+        after = text[end:]
 
-    dates = extract_dates(get_last_sentence(before)) + extract_dates(get_last_sentence(after))
-    if dates:
-        date = dates[0]
-    else:
-        dates = extract_dates(get_last_paragraph(before)) + extract_dates(get_last_paragraph(after))
+        dates = extract_dates(get_last_sentence(before)) + extract_dates(get_last_sentence(after))
         if dates:
             date = dates[0]
         else:
-            date = None
+            dates = extract_dates(get_last_paragraph(before)) + extract_dates(get_last_paragraph(after))
+            if dates:
+                date = dates[0]
+            else:
+                date = None
 
-    result = {'date': date, 'hash': str(date) + "-" + str(location), 'location': location, 'context': get_paragraph(text, int((start+end)/2))}
-    return result
+        result = {'date': date, 'hash': str(date) + "-" + str(location), 'location': location, 'context': get_paragraph(text, int((start+end)/2))}
+        return result
  
 
 def getLocationsAndDatesFromEnglishText(text):
@@ -942,28 +943,47 @@ def getLocationsAndDatesFromEnglishText(text):
     results = []
 
     # location after keyword
-    for m in finditer(ur"(?:(?:[^A-Za-z]|^)(?:cross the|in|entered|into|outside of|from|eastern|western|northern|southern|reached|countries|leaving|to) )([A-Z][a-z]+)", text, MULTILINE):
-        results.append(get_info_from_match_group(m))
+    for m in finditer(ur"(?:(?:[^A-Za-z]|^)(?:cross the|in|entered|into|outside of|from|eastern|western|northern|southern|reached|countries|leaving|to) )((?:[A-Z][a-z]+)(?: [A-Z][a-z]+)?)", text, MULTILINE):
+        result = get_info_from_match_group(m)
+        if result:
+            results.append(result)
         
     # keyword after country as name or acronym
     for m in finditer(ur"([A-Z][a-z]+|[A-Z]{2,}) (?:city|county|province)", text, MULTILINE):
-        results.append(get_info_from_match_group(m))
+        result = get_info_from_match_group(m)
+        if result:
+            results.append(result)
+ 
 
     # keyword after country as name or acronym
     for m in finditer(ur"([A-Z][a-z]+|[A-Z]{2,})'s (?:border|prime minister|southern|western|northern|eastern|defense minister)", text, MULTILINE):
-        results.append(get_info_from_match_group(m))
+        result = get_info_from_match_group(m)
+        if result:
+            results.append(result)
+
 
     # Greece-Macedonia border
     for m in finditer(ur"([A-Z][a-z]+)-([A-Z][a-z]+) border", text, MULTILINE):
-        results.append(get_info_from_match_group(m))
+        result = get_info_from_match_group(m)
+        if result:
+            results.append(result)
+
 
     #countries, especially/like/ Italy, Greece and Hungary.
     for m in finditer(ur"(?:countries|nations|places), [a-z]+ ([A-Z][a-z]+), ([A-Z][a-z]+) and ([A-Z][a-z]+)", text, MULTILINE):
-        results.append(get_info_from_match_group(m))
+        result = get_info_from_match_group(m)
+        if result:
+            results.append(result)
+
+
 
     #islands of Kos, Chios, Lesvos and Samos 
     for m in finditer(ur"(?:countries|islands|nations|places|states) of ([A-Z][a-z]+), ([A-Z][a-z]+), ([A-Z][a-z]+)+ and ([A-Z][a-z]+)", text, MULTILINE):
-        results.append(get_info_from_match_group(m))
+        result = get_info_from_match_group(m)
+        if result:
+            results.append(result)
+
+
 
     #ignore demonyms for now, because accuracy is not that high
     #Eritreans, Syrian

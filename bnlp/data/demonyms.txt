@@ -252,3 +252,4 @@ Western Sahara,Sahrawi,Sahraouis,Sahrawian,Sahrawis,Sahraouian
 Yemen,Yemeni,Yemenis
 Zambia,Zambian,Zambians
 Zimbabwe,Zimbabweans,Zimbabwean
+Italy,Italiana,Italiano
