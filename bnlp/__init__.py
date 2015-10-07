@@ -4,6 +4,7 @@ import bs4, nltk, os, pytz, re, time, urlparse
 from nltk.corpus import wordnet
 import numpy, random
 from bs4 import BeautifulSoup
+from bscrp import isJavaScript
 #from pattern.en import pluralize, singularize
 from stop_words import get_stop_words
 from nltk.tree import Tree
@@ -919,7 +920,12 @@ def get_info_from_match_group(m):
             else:
                 date = None
 
-        result = {'date': date, 'hash': str(date) + "-" + str(location), 'location': location, 'context': get_paragraph(text, int((start+end)/2))}
+        context = get_paragraph(text, int((start+end)/2))
+        if isJavaScript(context):
+            context = ''
+
+        result = {'date': date, 'hash': str(date) + "-" + str(location), 'location': location, 'context': context}
+
         return result
  
 
