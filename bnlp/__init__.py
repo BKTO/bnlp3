@@ -1002,6 +1002,19 @@ def getLocationsAndDatesFromEnglishText(text):
             results.append(result)
 
 
+    # this essentially changes the location name from the short version to any verbose version used in the text
+    # e.g. Capsian changes to Caspian Sea
+    locations = [result['location'] for result in results]
+
+    #see: http://stackoverflow.com/questions/21720199/python-remove-any-element-from-a-list-of-strings-that-is-a-substring-of-anothe
+    locations_verbose = filter(lambda x: [x for i in locations if x in i and x != i] == [], locations)
+    for result in results:
+        location = result['location']
+        for location_verbose in locations_verbose:
+            if not location == location_verbose and location in location_verbose:
+                print "changing " + location + " to " + location_verbose
+                result['location'] = location_verbose
+
     grouped_by_hash = {}
     for result in results:
         h = result['hash']
