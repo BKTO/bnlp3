@@ -1,5 +1,8 @@
+from numpy import mean
+from random import choice
+
 def getAverageCharacterNumber(text):
-    return numpy.mean([ord(random.choice(text)) for n in range(100)])
+    return mean([ord(choice(text)) for n in range(100)])
 
 def isEnglish(text):
     return getAverageCharacterNumber(text) < 100

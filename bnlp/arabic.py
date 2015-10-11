@@ -111,7 +111,12 @@ def getVariationsOfArabicTransliteration(string):
     # o,u
     # h, kh
     # g,q
-    pass
+    variations = set()
+    variations.add(string)
+    variations.add(string.replace("ay","ai"))
+    variations.add(string.replace("ai","ay"))
+    variations.add(elide(string))
+    return list(variations)
 
 def variateAl(string, replacement, capitalizedAfter):
     if capitalizedAfter:
