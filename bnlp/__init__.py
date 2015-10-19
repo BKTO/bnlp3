@@ -23,6 +23,7 @@ from locations import *
 from organizations import *
 from pagination import *
 from titles import *
+from transliterate import *
 
 # uses topic in the NLP sense
 # takes in a list of words for an LDA analysis

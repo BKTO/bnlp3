@@ -20,24 +20,41 @@ soup_regex = None
 global keywords
 keywords = None
 
+global keywords_arabic
+keywords_arabic = None
+
 filepath = dirname(abspath(__file__))
 
 def loadOrgKeywordsIfNecessary():
     global keywords
     if not keywords:
         with open(filepath + "/data/keywords/orgs.txt") as f:
-            keywords = [k for k in f.read().split('\n') if k]
+            keywords = [k for k in f.read().decode('utf-8').split('\n') if k]
             keywords = sorted(keywords, key=lambda x: -1*len(x))
-            print "keywords are", keywords
+            #print "keywords are", keywords
+
+def loadOrgKeywordsArabicIfNecessary():
+    global keywords_arabic
+    if not keywords_arabic:
+        with open(filepath + "/data/keywords/orgs_arabic.txt") as f:
+            keywords_arabic = [k for k in f.read().decode('utf-8').split('\n') if k]
+            keywords_arabic = sorted(keywords_arabic, key=lambda x: -1*len(x))
+            #print "keywords_arabic are", keywords_arabic
+
+
 
 # returns a version of the name with org keywords removed
 # e.g., University of Alabama will return Alabama
 def trimOrgName(name):
     global keywords
     loadOrgKeywordsIfNecessary()
+    loadOrgKeywordsArabicIfNecessary()
 
-    for keyword in keywords:
+    for keyword in keywords + keywords_arabic:
+        if name != name.replace(keyword,"").replace("  "," ").strip():
+            print "keyword", keyword
         name = name.replace(keyword,"").replace("  "," ").strip()
+    print "name after keyword removal is", name
     name = sub(r"( wal-|al-|')$", "", name, IGNORECASE)
     name = sub(r"^(of|the) ", "", name, IGNORECASE)
     name = sub(r"^(of|the) ", "", name, IGNORECASE)

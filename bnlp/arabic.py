@@ -1,14 +1,30 @@
+#-*- coding: utf-8 -*-
 import __init__
 import nltk
+from os.path import abspath, dirname
 import re
-from re import findall, finditer, MULTILINE
+from re import findall, finditer, MULTILINE, UNICODE
+from re import compile as re_compile
 
-def clean(text):
+global keywords_orgs
+keywords_orgs = None
+
+filepath = dirname(abspath(__file__))
+
+def loadOrgKeywordsIfNecessary():
+    global keywords_orgs
+    if not keywords_orgs:
+        with open(filepath + "/data/keywords/orgs_arabic.txt") as f:
+            keywords_orgs = [k for k in f.read().decode('utf-8').split('\n') if k]
+            keywords_orgs = sorted(keywords_orgs, key=lambda x: -1*len(x))
+            print "keywords_orgs are", keywords_orgs
+
+def cleanOrg(text):
     if isinstance(text,str):
         text = text.decode("utf-8")
 
     #remove diacritics
-    #
+    text = text.rstrip(u'\xbb')
 
     return text
 
@@ -76,7 +92,10 @@ dictionary = {}
 dictionary['\u0627\u0644\u0623\u062B\u0646\u064A\u0646'] = "AlIthnayn/Monday"
 dictionary['\u060c'] = "reverse/arabic comma"
 
-def getOrgsFromText(text):
+
+def getOrgsFromTextArabic(text):
+
+    """
     d = {}
     d[u'\u0627\u0644\u062c\u0645\u0639\u064a\u0629']= "jamiaee/association"
     d[u'\u062c\u0628\u0647\u0629'] = 'jabhat/front'
@@ -93,6 +112,21 @@ def getOrgsFromText(text):
     d[u'\u062d\u0632\u0628'] = "hezb/party"
     d[u'\u063a\u0631\u0628\u0627\u0621'] = "ghuraba/strangers/foreigners"
     orgs = list(set(findall(ur"(?:(?:\u063a\u0631\u0628\u0627\u0621|\u062d\u0632\u0628|\u0627\u0644\u0625\u062e\u0648\u0627\u0646|\u0641\u064a\u0644\u0642|\u062d\u0631\u0643\u0629|\u0643\u062a\u0627\u0626\u0628|\u0643\u062a\u0627\u0626\u0628|\u0647\u064a\u0626\u0629|\u0644\u0648\u0627\u0621|\u062c\u064a\u0634|\u0627\u0644\u062c\u0645\u0639\u064a\u0629|\u062c\u0628\u0647\u0629|\u0645\u0646\u0638\u0645\u0629|\u0648\u0632\u0627\u0631\u0629)(?: (?:(?:\u0627\u0644[^ .,\u060ci\n\r]*)|\u0641\u064a|(?:\u0628[^ .,\u060c\n\r]*)))+)", text, MULTILINE)))
+    """
+    global keywords_orgs
+    loadOrgKeywordsIfNecessary()
+
+    if isinstance(text, str):
+        text = text.decode('utf-8')
+
+    keyword_pattern = u"(?:" + u"|".join(keywords_orgs) + u")"
+    pattern = u"(?:" + keyword_pattern + u"(?: (?:(?:\u0627\u0644[^ .,\u060c\n\r<\"]*)|\u0641\u064a|(?:\u0628[^ .,\u060c\n\r<\"]*)))+)"
+    comp = re_compile(pattern, MULTILINE|UNICODE)
+    print type(pattern), pattern
+    found = findall(comp, text)
+    found = [cleanOrg(f) for f in found]
+    orgs = list(set(found))
+
     orgs.sort(key=len, reverse=True) 
     orgsAsDictionary = {}
     for org in orgs:
@@ -123,3 +157,16 @@ def variateAl(string, replacement, capitalizedAfter):
         return re.sub(r"(?P<start>^|[ ])(?P<al>[Aa]l[- ]?)(?P<after>[A-z])", lambda m: m.group("start")+replacement+m.group("after").upper(), string)
     else:
         return re.sub(r"(?P<start>^|[ ])(?P<al>[Aa]l[- ]?)(?P<after>[A-z])", lambda m: m.group("start")+replacement+m.group("after").lower(), string)
+
+#def transliterate(text):
+#    ar_en = {'ا':'a','ب':'b','ة':'at','ت':'t','ث':'th','ج':'g','ح':'h','خ':'kh','د':'d','ذ':'th','ر':'r','ز':'z','س':'s','ش':'sh','ص':'s','ض':'d','ط':'t','ظ':'th','ع':'a','غ':'g','ف':'f','ق':'q','ك':'k','ل':'l','م':'m','ن':'n','ه':'h','و':'w','ى':'a','ي':'y'}
+
+#    if isinstance(text, str):
+#        text = text.decode('utf-8')
+
+#    for ar, en in ar_en:
+#        ar[ar.decode('utf-8')] = en.decode('utf-8')
+
+#    for ar, en in ar_en:
+#        text = text.replace(ar,en)
+#    return text
