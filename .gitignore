@@ -63,3 +63,6 @@ target/
 
 #ignore any old file
 *old*
+
+# backups
+*bak*

@@ -5,6 +5,7 @@ from re import findall, IGNORECASE, MULTILINE, sub, UNICODE
 from re import compile as re_compile
 from titlecase import titlecase
 
+
 global stopwords
 stopwords = None
 
@@ -45,21 +46,38 @@ def loadOrgKeywordsArabicIfNecessary():
 
 # returns a version of the name with org keywords removed
 # e.g., University of Alabama will return Alabama
-def trimOrgName(name):
+def trimOrgName(name, min_words=0):
     global keywords
     loadOrgKeywordsIfNecessary()
     loadOrgKeywordsArabicIfNecessary()
 
     for keyword in keywords + keywords_arabic:
-        if name != name.replace(keyword,"").replace("  "," ").strip():
-            print "keyword", keyword
-        name = name.replace(keyword,"").replace("  "," ").strip()
-    print "name after keyword removal is", name
-    name = sub(r"( wal-|al-|')$", "", name, IGNORECASE)
-    name = sub(r"^(of|the) ", "", name, IGNORECASE)
-    name = sub(r"^(of|the) ", "", name, IGNORECASE)
-    name = name.replace("  "," ").strip()
+        if name.count(" ") + 1 > min_words:
+            name = name.replace(keyword,"").replace("  "," ").strip()
+        else:
+            return name
+    if name.count(" ") + 1 > min_words:
+        name = sub(r"( wal-|al-|')$", "", name, IGNORECASE)
+        name = sub(r"^(of|the) ", "", name, IGNORECASE)
+        name = sub(r"^(of|the) ", "", name, IGNORECASE)
+        name = name.replace("  "," ").strip()
     return name
+
+def trim_org_name(name, min_word_count=None):
+    global keywords
+    global keywords_arabic
+    loadOrgKeywordsIfNecessary()
+    loadOrgKeywordsArabicIfNecessary()
+    keywords_all = keywords + keywords_arabic
+
+    words = name.split()
+    length = len(words)
+    while len(words) >= min_word_count:
+        if words[0] in keywords_all:
+            words = words[1:]
+        if len(words) >= min_word_count and words[-1] in keywords_all:
+            words = words[:-1]
+    return " ".join(words)
  
 def createOrgRegexIfNecessary():
     global keywords
@@ -110,9 +128,13 @@ def createSoupRegexIfNecessary():
 
         keyword_pattern = u"(?:" + u"|".join(keywords) + ")"
 
-        titled_pattern = u"(?:\d*(?:st|nd|th)[ ])?(?:al-|ash-|ath-)?[A-Z][a-z(a'|'a)]{2,}(?:(?: |-i-)(?:al-|ash-|ath-|bin |of |of the |wal-|wa-)?[A-Z][a-z('a|a')]{2,})*"
-        soup_regex = re_compile(u"^((?:"+titled_pattern+" )*" + keyword_pattern + "(?: "+titled_pattern+")*)$")
+        titled_pattern = u"(?:\d*(?:st|nd|th)[ ])?(?:al|al-|al |ash|ash-|ash |at|at-|at |ath|ath-|ath )?[A-Z][a-z(a'|'a)]{2,}(?:(?: |-i-)(?:al|al-|al |ash|ash-|ash |at|at-|at |ath|ath-|ath |bin |of |of the |wal|wal-|wal |wa|wa-|wa )?[A-Z][a-z('a|a')]{2,})*"
+        soup_regex = re_compile(u"^((?:"+titled_pattern+" )*" + keyword_pattern + "(?: "+titled_pattern+")*)$", IGNORECASE|UNICODE)
  
+def return_soup_regex():
+    global soup_regex
+    createSoupRegexIfNecessary()
+    return soup_regex
 
 def getOrgsFromSoup(soup):
     global soup_regex
@@ -122,23 +144,30 @@ def getOrgsFromSoup(soup):
         print 'starting getOrgsFromSoup'
 #        for elem in soup(text=org_regex):
 #            print "    ", elem
-        return soup.find_all('a', text=soup_regex)
+        orgs = soup.find_all('a', text=soup_regex) + soup.find_all('li', text=soup_regex)
+        return [org for org in orgs if isOrganization(org.text.strip())]
 
     except Exception as e:
         print e
 
 def loadStopWordsIfNecessary():
+    #print "starting loadStopWordsIfNecessary"
     global stopwords
     if not stopwords:
-        filepath = os.path.dirname(os.path.abspath(__file__))
+        filepath = os.path.dirname(os.path.abspath(__file__)) + "/data/stopwords/orgs.txt"
+        print "filepath is", filepath
         if isfile(filepath):
-            with open(filepath + "/data/stopwords/orgs.txt", "r") as f:
-                stopwords = [line.strip() for line in f if line]
+            with open(filepath) as f:
+                stopwords = [line.strip().lower() for line in f if line]
 
 def isOrganization(text):
+    print "starting isOrganization with", text
     global stopwords
+    global keywords
+    global keywords_arabic
+    loadOrgKeywordsIfNecessary()
+    loadOrgKeywordsArabicIfNecessary()
     loadStopWordsIfNecessary() 
-
 
     text = text.lower()
 
@@ -157,8 +186,9 @@ def isOrganization(text):
         if wordphrase in text:
             return False
 
-    for word in ("army", "assembly", "battalion", "bloc", "brigade", "brotherhood", "bureau", "church", "clan", "coalition", "commission", "committee", "community", "companies", "congress", "corps", "council", "department", "division", "force", "foundation", "front", "government", "group", "guard", "haraka", "hezb", "hizb", "house", "institute", "jabhat", "jaish", "jaysh", "legion", "liwa", "ministry", "movement", "office", "org", "organization", "parliament", "party", "rally", "senate", "supporters", "squadron", "unit", "union", "university"):
-        if word in text:
+    #for word in ("army", "assembly", "battalion", "bloc", "brigade", "brotherhood", "bureau", "church", "clan", "coalition", "commission", "committee", "community", "companies", "congress", "corps", "council", "department", "division", "force", "foundation", "front", "government", "group", "guard", "haraka", "hezb", "hizb", "house", "institute", "jabhat", "jaish", "jaysh", "legion", "liwa", "ministry", "movement", "office", "org", "organization", "parliament", "party", "rally", "senate", "supporters", "squadron", "unit", "union", "university"):
+    for word in keywords + keywords_arabic:
+        if word.lower() in text.lower():
             return True
 
     return False
