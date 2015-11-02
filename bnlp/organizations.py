@@ -161,7 +161,6 @@ def loadStopWordsIfNecessary():
                 stopwords = [line.strip().lower() for line in f if line]
 
 def isOrganization(text):
-    print "starting isOrganization with", text
     global stopwords
     global keywords
     global keywords_arabic

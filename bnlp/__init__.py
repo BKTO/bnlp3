@@ -98,7 +98,6 @@ def isRegular(string):
             lowered += 1
 
     percentageLowered = float(lowered) / float(len(excerpt_split))
-#    print "percentageLowered = ", percentageLowered
     if percentageLowered > .4:
         return True
     else:
@@ -156,18 +155,6 @@ def overlap(alpha, beta):
     result = set(alpha) & set(beta)
     print "result is", result
     return result
-
-
-def lookupByLists(inputList):
-   print "\n\n\n"
-   print "dir(wordnet)", dir(wordnet)
-
-# looks up by definition in listOfWords
-# such as "ship", "embark", "send", "transport"
-def lookupDefinitionsByListOfWords(words):
-    definitions = {}
-     
-
 
 # groups LDA output into lists with different ideas separated
 # e.g., so if list is sea, ocean, travel, ship, water
@@ -275,14 +262,6 @@ def getVariationsOfName(name, transliteratedFromArabic=False):
 
     return list(set(names))
 
-        
-
-def p(string, object=None):
-    if object is None:
-        print string
-    else:
-        print string, object
-
 def extract_entities(text):
     print "starting extract_entities"
     results = []
@@ -329,16 +308,12 @@ def getFirstDateFromText(text):
     result = re.search('(\d{4})-(\d{2})-(\d{2})', text, re.IGNORECASE)
     if result is not None and ((result.group(2) <= 31 and result.group(3) <= 12) or (result.group(2) <= 12 and result.group(3) <= 31)):
         date = result.group(0)
-        p('date is', date)
         datetimeobj = datetime.strptime(date, '%Y-%m-%d')
-        p('datetimeobj is', datetimeobj)
         return datetimeobj
     result = re.search('(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \\d{2}, \\d{4}', text, re.IGNORECASE)
     if result is not None:
         date = result.group(0)
-        p('date is', date)
         datetimeobj = datetime.strptime(date, '%a, %b %d, %Y')
-        p('datetimeobj is', datetimeobj)
         return datetimeobj
     print 'finishing getPageDate'
     return datetimeobj

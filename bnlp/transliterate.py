@@ -120,8 +120,6 @@ char_pattern = {}
 for char, variations in char_variations.iteritems():
     char_pattern[char] = '(' + '|'.join(sorted(variations, key=lambda x: -1*len(x))) + ')'
 
-print "char_pattern is", char_pattern
-
 def get_variations_as_pattern(string):
     print '\nstarting get_variations_as_pattern with', string
 

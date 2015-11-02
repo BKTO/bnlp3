@@ -17,7 +17,6 @@ def loadOrgKeywordsIfNecessary():
         with open(filepath + "/data/keywords/orgs_arabic.txt") as f:
             keywords_orgs = [k for k in f.read().decode('utf-8').split('\n') if k]
             keywords_orgs = sorted(keywords_orgs, key=lambda x: -1*len(x))
-            print "keywords_orgs are", keywords_orgs
 
 def cleanOrg(text):
     if isinstance(text,str):
@@ -29,10 +28,8 @@ def cleanOrg(text):
     return text
 
 def elide(string):
-    print "starting elide with", string
     # add in start
     return re.sub(r"(?P<before>^|[ ])(?P<a>[Aa])(?P<l>l)[- ]?(?P<elider>(sh)|(Sh)|(s)|(th)|(Th)|(t)|(T)|(d)|(D)|(f)|(F)|(n)|(N))", lambda m: m.group("before")+m.group("a")+m.group("elider").lower()+"-"+m.group("elider"), string)
-    print "finishing elide with", string
 
 
 def getLocationsFromText(text):
@@ -63,9 +60,6 @@ def getPeopleFromText(text):
 
     #director al... al... fee al.... b.... (name) 
     for result in finditer(ur"(?P<position>(?:\u0645\u062f\u064a\u0631)(?: (?:(?:\u0627\u0644[^ .,]*)|\u0641\u064a|(?:\u0628[^ .,]*)))*) \((?P<person>[^\)]*)\)", text, MULTILINE):
-        print "\nresult is", result
-        print "  person is", result.group("person")
-        print "  position is", result.group("position")
         people.append(result.group("person"))
 
     for result in finditer("^[\"'](?P<person>[^\"']*)[\"']: ?(?P<statement>[^\.\n$]*)$", text, MULTILINE):
@@ -122,7 +116,6 @@ def getOrgsFromTextArabic(text):
     keyword_pattern = u"(?:" + u"|".join(keywords_orgs) + u")"
     pattern = u"(?:" + keyword_pattern + u"(?: (?:(?:\u0627\u0644[^ .,\u060c\n\r<\"]*)|\u0641\u064a|(?:\u0628[^ .,\u060c\n\r<\"]*)))+)"
     comp = re_compile(pattern, MULTILINE|UNICODE)
-    print type(pattern), pattern
     found = findall(comp, text)
     found = [cleanOrg(f) for f in found]
     orgs = list(set(found))
