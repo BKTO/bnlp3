@@ -11,6 +11,7 @@ from nltk.tree import Tree
 from bs4.element import NavigableString
 from titlecase import titlecase
 from re import findall, finditer, MULTILINE, sub
+from re import compile as re_compile
 #from interviews import *
 
 from acronyms import *
@@ -24,6 +25,7 @@ from organizations import *
 from pagination import *
 from titles import *
 from transliterate import *
+from variate import *
 
 # uses topic in the NLP sense
 # takes in a list of words for an LDA analysis
@@ -40,6 +42,19 @@ try:
 except:
     stopwords = []
 
+# return regexp that we can guess matches domain
+def guess_domain_as_string(text, translate=None):
+    fuzzy_string = get_fuzzy_string(text)
+    acronym = getAcronymForWordPhrase(text)
+    pattern = "(?:" + fuzzy_string + "|" + acronym
+    if translate:
+        translation = translate(text)
+        fuzzy_string = get_fuzzy_string(translation)
+        acronym = getAcronymForWordPhrase(translation)
+        pattern += "|" + fuzzy_string + "|" + acronym
+    pattern += ")"
+    regexp = re_compile(pattern, IGNORECASE|UNICODE)
+    return regexp
 
 def get_sentences(text):
     return findall("[^\.\n]+",text)
