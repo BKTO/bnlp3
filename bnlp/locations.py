@@ -79,6 +79,7 @@ def trim_location(text):
 #    for term in ("The","Area","Islamic","Republic","of","Principality","Territory","Kingdom","Plurinational","State","Arab","Co-operative","Federal","Democratic","People's","Bailiwick","Repubblica","Hashemite","Union","Federation","Special Administrative","Region","United","Sultanate","Independent")
     result = sub("[^,]* (of|di) (the)?","",text, flags=IGNORECASE).strip()
     result = sub(ur"\(.*\)","", text, flags=IGNORECASE).strip()
+    result = sub(" Area$", "", result, flags=IGNORECASE).strip()
     for word in result.split():
         if word in dictionary:
             return dictionary[word]

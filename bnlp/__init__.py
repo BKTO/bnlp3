@@ -42,6 +42,28 @@ try:
 except:
     stopwords = []
 
+
+def isGibberishListOrSet(lst):
+    length = len(lst)
+    count = 0
+    for string in lst:
+        count += isGibberishString(string)
+    percentage = float(count) / float(length)
+    print "percentage gibberish is", percentage
+    return percentage > 0.3
+
+def isGibberishString(string):
+    if search("&[a-z]", string) or search(",[a-z]", string) or search("[A-Za-z]\d[A-Za-z]", string) or search(";[A-Za-z]", string):
+        return True
+    else:
+        return False
+
+def isGibberish(inpt):
+    if isinstance(inpt, list) or isinstance(inpt, set):
+        return isGibberishListOrSet(inpt)
+    elif isinstance(inpt, str):
+        return isGibberishString(inpt)
+
 # return regexp that we can guess matches domain
 def guess_domain_as_string(text, translate=None):
     fuzzy_string = get_fuzzy_string(text)
