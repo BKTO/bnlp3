@@ -6,6 +6,7 @@ import numpy, random
 from bs4 import BeautifulSoup
 from bscrp import isJavaScript
 #from pattern.en import pluralize, singularize
+from location_extractor import extract_locations
 from stop_words import get_stop_words
 from nltk.tree import Tree
 from bs4.element import NavigableString
@@ -53,7 +54,7 @@ def isGibberishListOrSet(lst):
     return percentage > 0.3
 
 def isGibberishString(string):
-    if search("&[a-z]", string) or search(",[a-z]", string) or search("[A-Za-z]\d[A-Za-z]", string) or search(";[A-Za-z]", string):
+    if search("&[a-z]", string) or search(",[a-z]", string) or search("[A-Za-z]\d[A-Za-z]", string) or search(";[A-Za-z]", string) or search("[a-z]\d{3,}", string):
         return True
     else:
         return False
