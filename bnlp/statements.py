@@ -4,10 +4,6 @@ def getStatementsFromTextArabic(text):
     d = {}
     d['\u0648\u0642\u0627\u0644\u062a'] = 'said'
 
-    # example
-    # text= """ï»®ï»ïºï» ïºï» ï»¤ïºïº£ïºªïº ïºïºïº´ï»£ ï»¢ïº ï» ïº³ ïºï»¸ï»¤ï»§ ïºï» ï»ï»®ï»¤ï»³ ïºï»¸ï»£ïº®ï»´ï»ï»³ ïºï»§ "ï»¡ï»®ïº ïºï» ïº¤ï»³ïºï» ï»¼ï»£ ï»­ïºï» ï»ï»¤ï» ï»³ïºïº ï»­ïºï» ï»ï»®ïº ïº´ïºï»³ïºïº ïºï» ïº§ïºïº»ïº ïºïºï»ïº©ï»®ï»ïº ïºï»ºïº³ï»¼ï»¤ï»³ïº".""" ï»ïºï»§ ï»²ï»¤ïºïº© ïºï»ï»¯ ïºï
-» ïºï»£ï»®ï»´ï» ï»­ïºï»ºï» 
-
 #    for statement in finditer(ur"(?P<verb>\u0648\u0642\u0627\u0644)(?P<speaker>.*)(?:aannn)?(?P<quote>\"[^\"]*\")", text, MULTILINE):
 #        statements.append({'speaker': statement.group('speaker'), 'verb': statement.group('verb'), 'quote': statement.group('quote')})
 
