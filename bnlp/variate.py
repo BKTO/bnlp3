@@ -1,12 +1,12 @@
 #-*- coding: utf-8 -*-
 from sys import exit
 #from variations import char_variations
-from en_en import d as en_en
+from .en_en import d as en_en
 from re import IGNORECASE, UNICODE
 from re import compile as re_compile
 
 def get_variations_as_pattern_as_string(string):
-    print '\nstarting get_variations_as_pattern with', string
+    print('\nstarting get_variations_as_pattern with', string)
 
     if isinstance(string, str):
         string = string.decode("utf-8")
@@ -21,7 +21,7 @@ def get_variations_as_pattern_as_string(string):
         else:
             pattern_as_string += char
 
-    print "finishing get_variations_as_pattern with", pattern_as_string
+    print("finishing get_variations_as_pattern with", pattern_as_string)
     return pattern_as_string
 
 v = get_variations_as_pattern_as_string
@@ -62,7 +62,7 @@ def get_fuzzy_string(text):
         else:
             o += char
         i+= 1
-    print "returning", o
+    print("returning", o)
     return o
 
          

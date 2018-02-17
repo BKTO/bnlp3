@@ -16,12 +16,12 @@ def loadDictionaryOfTranslationsIfNecessary():
             reader = csv_reader(f, delimiter=',', quotechar='"')
             for row in reader:
                 phrase_translation[row[0]] = row[1]
-            print "phrase_translation is", phrase_translation
+            print("phrase_translation is", phrase_translation)
 
 def translate(api_key, text, original_language=None):
         loadDictionaryOfTranslationsIfNecessary()  
     #try:
-        print "starting request_translation"
+        print("starting request_translation")
         if isinstance(text, str):
             text = text.decode('utf-8')
         headers = {'X-HTTP-Method-Override': 'GET'}
@@ -31,7 +31,7 @@ def translate(api_key, text, original_language=None):
         if len(text) < 3000:
             params['q'] = text
             r = post("https://www.googleapis.com/language/translate/v2", params=params, headers=headers)
-            print "r.text is", r.text
+            print("r.text is", r.text)
             translation = r.json()['data']['translations'][0]['translatedText'] 
         else:
             chunks = []

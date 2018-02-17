@@ -1,7 +1,7 @@
 def treeToString(tree):
-    print "starting treeToString with", treeToString
+    print("starting treeToString with", treeToString)
     # if for some reason, you're accidentally passing in a unicode or byte string, just return what you passed in
-    if isinstance(tree, unicode) or isinstance(tree, str):
+    if isinstance(tree, str) or isinstance(tree, str):
         return tree
     else:
         listOfTokens = []

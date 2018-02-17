@@ -1,12 +1,12 @@
 #-*- coding: utf-8 -*-
 from sys import exit
-from variations import ar_en
+from .variations import ar_en
 
 # returns previous, item, next
 def neighborhood(iterable):
     iterator = iter(iterable)
     prev = None
-    item = iterator.next()
+    item = next(iterator)
     for next in iterator:
         yield (prev,item,next)
         prev = item
@@ -14,7 +14,7 @@ def neighborhood(iterable):
     yield (prev,item,None)
 
 def get_variations_as_pattern(string):
-    print '\nstarting get_variations_as_pattern with', string
+    print('\nstarting get_variations_as_pattern with', string)
 
     if isinstance(string, str):
         string = string.decode("utf-8")
@@ -41,11 +41,11 @@ def transString(string, reverse=0):
     Buckwalter back to Unicode, set reverse=1'''
 
     if not reverse:     
-        for k,v in buck2uni.iteritems():
+        for k,v in buck2uni.items():
             string = string.replace(v.decode('utf-8'),k.decode('utf-8'))
 
     else:     
-        for k,v in buck2uni.iteritems():
+        for k,v in buck2uni.items():
             string = string.replace(k.decode('utf-8'),v.decode('utf-8'))
 
     return string

@@ -86,10 +86,10 @@ def createOrgRegexIfNecessary():
     global org_regex
     if not org_regex:
 
-        keyword_pattern = u"(?:" + u"|".join(keywords) + ")"
+        keyword_pattern = "(?:" + "|".join(keywords) + ")"
 
-        titled_pattern = u"(?:\d*(?:st|nd|th)[ ])?(?:al-|ash-|ath-)?[A-Z][a-z(a'|'a)]{2,}(?:(?: |-i-)(?:al-|ash-|ath-|bin |of |of the |wal-|wa-)?[A-Z][a-z('a|a')]{2,})*"
-        org_regex = re_compile(u"((?:"+titled_pattern+" )*" + keyword_pattern + "(?: "+titled_pattern+")*)")
+        titled_pattern = "(?:\d*(?:st|nd|th)[ ])?(?:al-|ash-|ath-)?[A-Z][a-z(a'|'a)]{2,}(?:(?: |-i-)(?:al-|ash-|ath-|bin |of |of the |wal-|wa-)?[A-Z][a-z('a|a')]{2,})*"
+        org_regex = re_compile("((?:"+titled_pattern+" )*" + keyword_pattern + "(?: "+titled_pattern+")*)")
 
 def xGetOrgsFromText(text):
     global keywords
@@ -97,17 +97,17 @@ def xGetOrgsFromText(text):
 
     global orgRegex
     if not orgRegex:
-        citation = u"(?: ?\[\d{1,3}\] ?)*"
-        keyword = u"(?:" + u"|".join(keywords) + ")"
-        seperator = u"(?:, |,|\u200E|\u200E | \u200E| \u200E | or |;|; ){1,3}"
+        citation = "(?: ?\[\d{1,3}\] ?)*"
+        keyword = "(?:" + "|".join(keywords) + ")"
+        seperator = "(?:, |,|\u200E|\u200E | \u200E| \u200E | or |;|; ){1,3}"
 
         # accept a as uppercase because sometimes used in acronymns such as Jash al-... Ja...
-        u = u"[^\W\d_b-z:]"
-        l = u"(?:[^\W\d_A-Z:]|')"
+        u = "[^\W\d_b-z:]"
+        l = "(?:[^\W\d_A-Z:]|')"
         acronym = u+'{2,}'
-        titled = u"(?:\d+(?:st|nd|th)[ ])?(?:al-|ash-|ath-|bin |of |of the |wal-|wa-)?" + u + l + "{2,}(?:(?: |-i-)(?:al-|ash-|ath-|bin |of |of the |wal-|wa-)?"+u+l+"{2,})*"
-        alias = u"(?:(?:"+u+l+"{3,}: ?|meaning\")?" + "("+titled+")" + "|" + '('+acronym+')' +  ")"
-        name = u"((?:"+titled+" )*" + keyword + "(?: "+titled+")*)" + citation
+        titled = "(?:\d+(?:st|nd|th)[ ])?(?:al-|ash-|ath-|bin |of |of the |wal-|wa-)?" + u + l + "{2,}(?:(?: |-i-)(?:al-|ash-|ath-|bin |of |of the |wal-|wa-)?"+u+l+"{2,})*"
+        alias = "(?:(?:"+u+l+"{3,}: ?|meaning\")?" + "("+titled+")" + "|" + '('+acronym+')' +  ")"
+        name = "((?:"+titled+" )*" + keyword + "(?: "+titled+")*)" + citation
         aliases = "(?: ?\(" + alias + "(?: ?" + seperator + alias + ")*" + ")*"
         org = name + "(?: or " + name + ")?" + aliases
         #orgRegex = re_compile(org, MULTILINE|UNICODE)
@@ -126,10 +126,10 @@ def createSoupRegexIfNecessary():
     global soup_regex
     if not soup_regex:
 
-        keyword_pattern = u"(?:" + u"|".join(keywords) + ")"
+        keyword_pattern = "(?:" + "|".join(keywords) + ")"
 
-        titled_pattern = u"(?:\d*(?:st|nd|th)[ ])?(?:al|al-|al |ash|ash-|ash |at|at-|at |ath|ath-|ath )?[A-Z][a-z(a'|'a)]{2,}(?:(?: |-i-)(?:al|al-|al |ash|ash-|ash |at|at-|at |ath|ath-|ath |bin |of |of the |wal|wal-|wal |wa|wa-|wa )?[A-Z][a-z('a|a')]{2,})*"
-        soup_regex = re_compile(u"^((?:"+titled_pattern+" )*" + keyword_pattern + "(?: "+titled_pattern+")*)$", IGNORECASE|UNICODE)
+        titled_pattern = "(?:\d*(?:st|nd|th)[ ])?(?:al|al-|al |ash|ash-|ash |at|at-|at |ath|ath-|ath )?[A-Z][a-z(a'|'a)]{2,}(?:(?: |-i-)(?:al|al-|al |ash|ash-|ash |at|at-|at |ath|ath-|ath |bin |of |of the |wal|wal-|wal |wa|wa-|wa )?[A-Z][a-z('a|a')]{2,})*"
+        soup_regex = re_compile("^((?:"+titled_pattern+" )*" + keyword_pattern + "(?: "+titled_pattern+")*)$", IGNORECASE|UNICODE)
  
 def return_soup_regex():
     global soup_regex
@@ -141,21 +141,21 @@ def getOrgsFromSoup(soup):
     createSoupRegexIfNecessary()
 
     try:
-        print 'starting getOrgsFromSoup'
+        print('starting getOrgsFromSoup')
 #        for elem in soup(text=org_regex):
 #            print "    ", elem
         orgs = soup.find_all('a', text=soup_regex) + soup.find_all('li', text=soup_regex)
         return [org for org in orgs if isOrganization(org.text.strip())]
 
     except Exception as e:
-        print e
+        print(e)
 
 def loadStopWordsIfNecessary():
     #print "starting loadStopWordsIfNecessary"
     global stopwords
     if not stopwords:
         filepath = os.path.dirname(os.path.abspath(__file__)) + "/data/stopwords/orgs.txt"
-        print "filepath is", filepath
+        print("filepath is", filepath)
         if isfile(filepath):
             with open(filepath) as f:
                 stopwords = [line.strip().lower() for line in f if line]

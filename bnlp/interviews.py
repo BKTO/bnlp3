@@ -2,7 +2,7 @@ import re
 #from __init__ import clean
 
 d = {}
-d['\u061f'] = "Inverted Question Mark"
+d['\\u061f'] = "Inverted Question Mark"
 
 def clean(text):
     return text
@@ -11,9 +11,9 @@ def getInterviewFromText(text):
 
     parts = [] 
 
-    interview_group = re.search(ur"((?:<[^>]*>|\n)*(?:[^>\n]*\u061f)(?:<[^>]*>|\n)*([^<\n]*)(?:<[^>]*>|\n)*){2,10}", text)
+    interview_group = re.search(r"((?:<[^>]*>|\n)*(?:[^>\n]*\u061f)(?:<[^>]*>|\n)*([^<\n]*)(?:<[^>]*>|\n)*){2,10}", text)
     interview_text = interview_group.group(0)
-    for chunk in re.finditer(ur"(?:(?:<[^>]*>|\n)*(?P<question>[^>\n]*\u061f)(?:<[^>]*>|\n)*(?P<answer>[^<\n]*)(?:<[^>]*>|\n)*){2,20}", text):
+    for chunk in re.finditer(r"(?:(?:<[^>]*>|\n)*(?P<question>[^>\n]*\u061f)(?:<[^>]*>|\n)*(?P<answer>[^<\n]*)(?:<[^>]*>|\n)*){2,20}", text):
         groupdict = chunk.groupdict()
         for key in groupdict:
             part = {}
@@ -22,8 +22,8 @@ def getInterviewFromText(text):
             if 'interviewee' in groupdict:
                 part['interviewee'] = clean(groupdict['interviewee'])
             else:
-                print "interviewee not captured so go get it!"
-                print "interview_text.start() is", interview_group.start()
+                print("interviewee not captured so go get it!")
+                print("interview_text.start() is", interview_group.start())
 
         
 from requests import get

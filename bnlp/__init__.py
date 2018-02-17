@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 from datetime import date, datetime
-import bs4, nltk, os, pytz, re, time, urlparse
+import bs4, nltk, os, pytz, re, time, urllib.parse
 from nltk.corpus import wordnet
 import numpy, random
 from bs4 import BeautifulSoup
@@ -15,18 +15,18 @@ from re import findall, finditer, MULTILINE, sub
 from re import compile as re_compile
 #from interviews import *
 
-from acronyms import *
-from arabic import *
-from dates import *
-from bnames import *
-from english import *
-from headers import *
-from locations import *
-from organizations import *
-from pagination import *
-from titles import *
-from transliterate import *
-from variate import *
+from .acronyms import *
+from .arabic import *
+from .dates import *
+from .bnames import *
+from .english import *
+from .headers import *
+from .locations import *
+from .organizations import *
+from .pagination import *
+from .titles import *
+from .transliterate import *
+from .variate import *
 
 # uses topic in the NLP sense
 # takes in a list of words for an LDA analysis
@@ -50,7 +50,7 @@ def isGibberishListOrSet(lst):
     for string in lst:
         count += isGibberishString(string)
     percentage = float(count) / float(length)
-    print "percentage gibberish is", percentage
+    print("percentage gibberish is", percentage)
     return percentage > 0.3
 
 def isGibberishString(string):
@@ -102,12 +102,12 @@ def get_last_paragraph(text):
 
 def isEntityInText(aliases, text):
     if isinstance(text, str):
-        text = unicode(text, encoding="utf-8")
+        text = str(text, encoding="utf-8")
 
     for alias in aliases:
         if isinstance(alias, str):
-            alias = unicode(alias, encoding="utf-8")
-        if alias.count(u" ") > 0 and alias in text:
+            alias = str(alias, encoding="utf-8")
+        if alias.count(" ") > 0 and alias in text:
             return True
     return False
 
@@ -189,9 +189,9 @@ def getKeywordsFromHtmlAsString(htmlAsString):
 
 # checks to see if two lists have at least one element in common
 def overlap(alpha, beta):
-    print "starting overlap with", alpha, beta
+    print("starting overlap with", alpha, beta)
     result = set(alpha) & set(beta)
-    print "result is", result
+    print("result is", result)
     return result
 
 # groups LDA output into lists with different ideas separated
@@ -201,7 +201,7 @@ def groupWords(words):
     thesaurus = {}
     for word in words:
         thesaurus[word] = getSynonymsForWord(word)
-    print "thesaurus are", thesaurus
+    print("thesaurus are", thesaurus)
 
     groups = []
     for key in thesaurus:
@@ -218,7 +218,7 @@ def groupWords(words):
     for group in groups:
         results.append(list(set(group)))
 
-    print "groups are ", results
+    print("groups are ", results)
 
     lookupByLists(results)
 
@@ -229,7 +229,7 @@ def find_bigrams(input_list):
     return bigram_list
 
 def find_ngrams(input_list, n):
-    return zip(*[input_list[i:] for i in range(n)])
+    return list(zip(*[input_list[i:] for i in range(n)]))
 
 def find_allgrams(input_list):
     result = []
@@ -238,7 +238,7 @@ def find_allgrams(input_list):
     return result
 
 def getPermutations(input_list):
-    if isinstance(input_list, str) or isinstance(input_list, unicode):
+    if isinstance(input_list, str) or isinstance(input_list, str):
         input_list = input_list.split(" ")
     output = []
     for listOfGrams in find_allgrams(input_list):
@@ -301,15 +301,15 @@ def getVariationsOfName(name, transliteratedFromArabic=False):
     return list(set(names))
 
 def extract_entities(text):
-    print "starting extract_entities"
+    print("starting extract_entities")
     results = []
     for sent in nltk.sent_tokenize(text):
-        print "for sent", sent
+        print("for sent", sent)
         for chunk in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sent))):
             if "label" in dir(chunk):
                 if chunk.label() in ["PERSON", "ORGANIZATION"]:
                     results.append((chunk.label(), ' '.join(c[0] for c in chunk.leaves())))
-    print "results are", results
+    print("results are", results)
     return results
 
 
@@ -341,7 +341,7 @@ def getPeopleFromText(text):
     return people
 
 def getFirstDateFromText(text):
-    print 'starting getPageDate'
+    print('starting getPageDate')
     datetimeobj = None
     result = re.search('(\d{4})-(\d{2})-(\d{2})', text, re.IGNORECASE)
     if result is not None and ((result.group(2) <= 31 and result.group(3) <= 12) or (result.group(2) <= 12 and result.group(3) <= 31)):
@@ -353,7 +353,7 @@ def getFirstDateFromText(text):
         date = result.group(0)
         datetimeobj = datetime.strptime(date, '%a, %b %d, %Y')
         return datetimeobj
-    print 'finishing getPageDate'
+    print('finishing getPageDate')
     return datetimeobj
 
 
@@ -362,96 +362,96 @@ def getDateFromTextArabic(text):
     d = {}
 
     #january
-    d[u'\u0643\u0627\u0646\u0648\u0646 \u0627\u0644\u062b\u0627\u0646\u064a'] = 1
-    d[u'\u064a\u0646\u0627\u064a\u0631'] = 1
-    d[u'\u0623\u064a \u0627\u0644\u0646\u0627\u0631'] = 1
-    d[u'\u062c\u0627\u0646\u0641\u064a'] = 1
-    d[u'\u064a\u0646\u0627\u064a\u0631'] = 1
+    d['\u0643\u0627\u0646\u0648\u0646 \u0627\u0644\u062b\u0627\u0646\u064a'] = 1
+    d['\u064a\u0646\u0627\u064a\u0631'] = 1
+    d['\u0623\u064a \u0627\u0644\u0646\u0627\u0631'] = 1
+    d['\u062c\u0627\u0646\u0641\u064a'] = 1
+    d['\u064a\u0646\u0627\u064a\u0631'] = 1
 
     #february
-    d[u'\u0634\u0628\u0627\u0637'] = 2
-    d[u'\u0641\u0628\u0631\u0627\u064a\u0631'] = 2
-    d[u'\u0627\u0644\u0646\u0648\u0627\u0631'] = 2
-    d[u'\u0641\u064a\u0641\u0631\u064a'] = 2
+    d['\u0634\u0628\u0627\u0637'] = 2
+    d['\u0641\u0628\u0631\u0627\u064a\u0631'] = 2
+    d['\u0627\u0644\u0646\u0648\u0627\u0631'] = 2
+    d['\u0641\u064a\u0641\u0631\u064a'] = 2
 
     # march
-    d[u'\u0622\u0630\u0627\u0631'] = 3
-    d[u'\u0645\u0627\u0631\u0633'] = 3
-    d[u'\u0627\u0644\u0631\u0628\u064a\u0639'] = 3
-    d[u'\u0645\u0627\u0631\u0633'] = 3
+    d['\u0622\u0630\u0627\u0631'] = 3
+    d['\u0645\u0627\u0631\u0633'] = 3
+    d['\u0627\u0644\u0631\u0628\u064a\u0639'] = 3
+    d['\u0645\u0627\u0631\u0633'] = 3
 
     #april
-    d[u'\u0646\u064a\u0633\u0627\u0646'] = 4
-    d[u'\u0623\u0628\u0631\u064a\u0644'] = 4
-    d[u'\u0625\u0628\u0631\u064a\u0644'] = 4
-    d[u'\u0627\u0644\u0637\u064a\u0631'] = 4
-    d[u'\u0623\u0641\u0631\u064a\u0644'] = 4
+    d['\u0646\u064a\u0633\u0627\u0646'] = 4
+    d['\u0623\u0628\u0631\u064a\u0644'] = 4
+    d['\u0625\u0628\u0631\u064a\u0644'] = 4
+    d['\u0627\u0644\u0637\u064a\u0631'] = 4
+    d['\u0623\u0641\u0631\u064a\u0644'] = 4
  
     #may
-    d[u'\u0623\u064a\u0627\u0631'] = 5
-    d[u'\u0645\u0627\u064a\u0648'] = 5
-    d[u'\u0627\u0644\u0645\u0627\u0621'] = 5
-    d[u'\u0645\u0627\u064a'] = 5
+    d['\u0623\u064a\u0627\u0631'] = 5
+    d['\u0645\u0627\u064a\u0648'] = 5
+    d['\u0627\u0644\u0645\u0627\u0621'] = 5
+    d['\u0645\u0627\u064a'] = 5
 
     #june
-    d[u'\u062d\u0632\u064a\u0631\u0627\u0646'] = 6
-    d[u'\u064a\u0648\u0646\u064a\u0648'] = 6
-    d[u'\u064a\u0648\u0646\u064a\u0629'] = 6
-    d[u'\u0627\u0644\u0635\u064a\u0641'] = 6
-    d[u'\u062c\u0648\u0627\u0646'] = 6
+    d['\u062d\u0632\u064a\u0631\u0627\u0646'] = 6
+    d['\u064a\u0648\u0646\u064a\u0648'] = 6
+    d['\u064a\u0648\u0646\u064a\u0629'] = 6
+    d['\u0627\u0644\u0635\u064a\u0641'] = 6
+    d['\u062c\u0648\u0627\u0646'] = 6
 
     #july
-    d[u'\u062a\u0645\u0648\u0632'] = 7
-    d[u'\u064a\u0648\u0644\u064a\u0648'] = 7
-    d[u'\u064a\u0648\u0644\u064a\u0629'] = 7
-    d[u'\u0646\u0627\u0635\u0631'] = 7
-    d[u'\u062c\u0648\u064a\u0644\u064a\u0629'] = 7
-    d[u'\u064a\u0648\u0644\u064a\u0648\u0632'] = 7
+    d['\u062a\u0645\u0648\u0632'] = 7
+    d['\u064a\u0648\u0644\u064a\u0648'] = 7
+    d['\u064a\u0648\u0644\u064a\u0629'] = 7
+    d['\u0646\u0627\u0635\u0631'] = 7
+    d['\u062c\u0648\u064a\u0644\u064a\u0629'] = 7
+    d['\u064a\u0648\u0644\u064a\u0648\u0632'] = 7
 
     #august
-    d[u'\u0622\u0628'] = 8
-    d[u'\ufe82\ufe91'] = 8
-    d[u'\u0623\u063a\u0633\u0637\u0633'] = 8
-    d[u'\u0647\u0627\u0646\u064a\u0628\u0627\u0644'] = 8
-    d[u'\u0623\u0648\u062a'] = 8
-    d[u'\u063a\u0634\u062a'] = 8
+    d['\u0622\u0628'] = 8
+    d['\ufe82\ufe91'] = 8
+    d['\u0623\u063a\u0633\u0637\u0633'] = 8
+    d['\u0647\u0627\u0646\u064a\u0628\u0627\u0644'] = 8
+    d['\u0623\u0648\u062a'] = 8
+    d['\u063a\u0634\u062a'] = 8
 
     #september
-    d[u'\u0623\u064a\u0644\u0648\u0644'] = 9
-    d[u'\u0633\u0628\u062a\u0645\u0628\u0631'] = 9
-    d[u'\u0627\u0644\u0641\u0627\u062a\u062d'] = 9
-    d[u'\u0633\u0628\u062a\u0645\u0628\u0631'] = 9
-    d[u'\u0634\u062a\u0645\u0628\u0631'] = 9
+    d['\u0623\u064a\u0644\u0648\u0644'] = 9
+    d['\u0633\u0628\u062a\u0645\u0628\u0631'] = 9
+    d['\u0627\u0644\u0641\u0627\u062a\u062d'] = 9
+    d['\u0633\u0628\u062a\u0645\u0628\u0631'] = 9
+    d['\u0634\u062a\u0645\u0628\u0631'] = 9
 
     #october
-    d[u'\u062a\u0634\u0631\u064a\u0646 \u0627\u0644\u0623\u0648\u0644'] = 10
-    d[u'\u0623\u0643\u062a\u0648\u0628\u0631'] = 10
-    d[u'\u0627\u0644\u062a\u0645\u0648\u0631'] = 10
-    d[u'\u0627\u0644\u062b\u0645\u0648\u0631'] = 10
-    d[u'\u0623\u0643\u062a\u0648\u0628\u0631'] = 10
+    d['\u062a\u0634\u0631\u064a\u0646 \u0627\u0644\u0623\u0648\u0644'] = 10
+    d['\u0623\u0643\u062a\u0648\u0628\u0631'] = 10
+    d['\u0627\u0644\u062a\u0645\u0648\u0631'] = 10
+    d['\u0627\u0644\u062b\u0645\u0648\u0631'] = 10
+    d['\u0623\u0643\u062a\u0648\u0628\u0631'] = 10
 
     #november
-    d[u'\u062a\u0634\u0631\u064a\u0646 \u0627\u0644\u062b\u0627\u0646\u064a'] = 11
-    d[u'\u0646\u0648\u0641\u0645\u0628\u0631'] = 11
-    d[u'\u0627\u0644\u062d\u0631\u062b'] = 11
-    d[u'\u0646\u0648\u0641\u0645\u0628\u0631'] = 11
-    d[u'\u0646\u0648\u0646\u0628\u0631'] = 11
+    d['\u062a\u0634\u0631\u064a\u0646 \u0627\u0644\u062b\u0627\u0646\u064a'] = 11
+    d['\u0646\u0648\u0641\u0645\u0628\u0631'] = 11
+    d['\u0627\u0644\u062d\u0631\u062b'] = 11
+    d['\u0646\u0648\u0641\u0645\u0628\u0631'] = 11
+    d['\u0646\u0648\u0646\u0628\u0631'] = 11
 
     #december
-    d[u'\u0643\u0627\u0646\u0648\u0646 \u0627\u0644\u0623\u0648\u0644'] = 12
-    d[u'\u062f\u064a\u0633\u0645\u0628\u0631'] = 12
-    d[u'\u0627\u0644\u0643\u0627\u0646\u0648\u0646'] = 12
-    d[u'\u062f\u064a\u0633\u0645\u0628\u0631'] = 12
-    d[u'\u062f\u062c\u0645\u0628\u0631'] = 12
+    d['\u0643\u0627\u0646\u0648\u0646 \u0627\u0644\u0623\u0648\u0644'] = 12
+    d['\u062f\u064a\u0633\u0645\u0628\u0631'] = 12
+    d['\u0627\u0644\u0643\u0627\u0646\u0648\u0646'] = 12
+    d['\u062f\u064a\u0633\u0645\u0628\u0631'] = 12
+    d['\u062f\u062c\u0645\u0628\u0631'] = 12
 
-    result = re.search(ur'(?P<day>\d{1,2}) (?P<month>\u0643\u0627\u0646\u0648\u0646 \u0627\u0644\u062b\u0627\u0646\u064a|\u0634\u0628\u0627\u0637|\u0622\u0630\u0627\u0631|\u0646\u064a\u0633\u0627\u0646|\u0623\u064a\u0627\u0631|\u062d\u0632\u064a\u0631\u0627\u0646|\u062a\u0645\u0648\u0632|\u0622\u0628|\u0623\u064a\u0644\u0648\u0644|\u062a\u0634\u0631\u064a\u0646 \u0627\u0644\u0623\u0648\u0644|\u062a\u0634\u0631\u064a\u0646 \u0627\u0644\u062b\u0627\u0646\u064a|\u0643\u0627\u0646\u0648\u0646 \u0627\u0644\u0623\u0648\u0644)\u060c (?P<year>\d{4})', text)
+    result = re.search(r'(?P<day>\d{1,2}) (?P<month>\u0643\u0627\u0646\u0648\u0646 \u0627\u0644\u062b\u0627\u0646\u064a|\u0634\u0628\u0627\u0637|\u0622\u0630\u0627\u0631|\u0646\u064a\u0633\u0627\u0646|\u0623\u064a\u0627\u0631|\u062d\u0632\u064a\u0631\u0627\u0646|\u062a\u0645\u0648\u0632|\u0622\u0628|\u0623\u064a\u0644\u0648\u0644|\u062a\u0634\u0631\u064a\u0646 \u0627\u0644\u0623\u0648\u0644|\u062a\u0634\u0631\u064a\u0646 \u0627\u0644\u062b\u0627\u0646\u064a|\u0643\u0627\u0646\u0648\u0646 \u0627\u0644\u0623\u0648\u0644)\u060c (?P<year>\d{4})', text)
     if result:
         return datetime(int(result.group("year")), d[result.group("month")], int(result.group("day")), tzinfo=pytz.UTC)
 
 
 def getDateFromTextOld(text):
-    print "starting getDateFromText with, ", type(text)
-    print dir(text)
+    print("starting getDateFromText with, ", type(text))
+    print(dir(text))
 
     year = '\\d{4}'
     months = '(January|February|March|April|May|June|July|August|September|October|November|December)'
@@ -459,49 +459,49 @@ def getDateFromTextOld(text):
 
 
     pattern = months + " " + day + ", " + year
-    print "pattern is", pattern
+    print("pattern is", pattern)
     result = re.search(pattern, text) 
     if result is not None:
         date = result.group(0)
-        print "date is", date
+        print("date is", date)
         dateObj = datetime.strptime(date, '%B %d, %Y') 
-        print "dateObj is", dateObj
+        print("dateObj is", dateObj)
         dateObjTz = dateObj.replace(tzinfo=pytz.UTC)
         return dateObjTz
 
     #sometimes there's a typo and no comma
     pattern = months + " " + day + " " + year
-    print "pattern is", pattern
+    print("pattern is", pattern)
     result = re.search(pattern, text) 
     if result is not None:
         date = result.group(0)
-        print "date is", date
+        print("date is", date)
         dateObj = datetime.strptime(date, '%B %d %Y') 
-        print "dateObj is", dateObj
+        print("dateObj is", dateObj)
         dateObjTz = dateObj.replace(tzinfo=pytz.UTC)
         return dateObjTz
 
     #day month year
     pattern = day + " " + months + " " + year
-    print "pattern is", pattern
+    print("pattern is", pattern)
     result = re.search(pattern, text) 
     if result is not None:
         date = result.group(0)
-        print "date is", date
+        print("date is", date)
         dateObj = datetime.strptime(date, '%d %B %Y') 
-        print "dateObj is", dateObj
+        print("dateObj is", dateObj)
         dateObjTz = dateObj.replace(tzinfo=pytz.UTC)
         return dateObjTz
 
     #day month, year
     pattern = day + " " + months + ", " + year
-    print "pattern is", pattern
+    print("pattern is", pattern)
     result = re.search(pattern, text) 
     if result is not None:
         date = result.group(0)
-        print "date is", date
+        print("date is", date)
         dateObj = datetime.strptime(date, '%d %B, %Y') 
-        print "dateObj is", dateObj
+        print("dateObj is", dateObj)
         dateObjTz = dateObj.replace(tzinfo=pytz.UTC)
         return dateObjTz
 
@@ -550,7 +550,7 @@ def x(text, reference_date=None):
 """ 
 
 def getDatesFromText(text, pagedate):
-    print 'starting getDatesFromText'
+    print('starting getDatesFromText')
 
     days_abbreviated = '(Mon|Tue|Wed|Thu|Fri|Sat|Sun)'
     months_abbreviated = '(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)'
@@ -558,48 +558,48 @@ def getDatesFromText(text, pagedate):
     year = '\\d{4}'
     result = re.search('\(' + months + ' ' + year + '-\)', text, re.IGNORECASE)
     if result is not None:
-        print 'a'
+        print('a')
         date = result.group(0)
-        print 'date is', date
+        print('date is', date)
         start = datetime.strptime(date, '%B %Y-)')
-        print 'datetimeobj is', start
+        print('datetimeobj is', start)
         end = datetime.now()
         return (start, end)
     result = re.search('(\\d{4}-\\d{2}-\\d{2})', text, re.IGNORECASE)
     if result is not None:
-        print 'b'
+        print('b')
         date = result.group(0)
-        print 'date is', date
+        print('date is', date)
         datetimeobj = datetime.strptime(date, '%Y-%m-%d')
-        print 'datetimeobj is', datetimeobj
+        print('datetimeobj is', datetimeobj)
         return (datetimeobj, datetimeobj)
     result = re.search(days_abbreviated + ', ' + months_abbreviated + ' \\d{2}, \\d{4}', text, re.IGNORECASE)
     if result is not None:
-        print 'c'
+        print('c')
         date = result.group(0)
-        print 'date is', date
+        print('date is', date)
         datetimeobj = datetime.strptime(date, '%a, %b %d, %Y')
-        print 'datetimeobj is', datetimeobj
+        print('datetimeobj is', datetimeobj)
         return (datetimeobj, datetimeobj)
     result = re.search('\\d{1,2} ' + months + ' ' + year, text, re.IGNORECASE)
     if result is not None:
-        print 'd'
+        print('d')
         date = result.group(0)
-        print 'date is', date
+        print('date is', date)
         datetimeobj = datetime.strptime(date, '%d %B %Y')
-        print 'datetimeobj is', datetimeobj
+        print('datetimeobj is', datetimeobj)
         return (datetimeobj, datetimeobj)
     result = re.search(months + ' ' + year, text, re.IGNORECASE)
     if result is not None:
-        print 'e'
+        print('e')
         date = result.group(0)
-        print 'date is', date
+        print('date is', date)
         datetimeobj = datetime.strptime(date, '%B %Y')
-        print 'datetimeobj is', datetimeobj
+        print('datetimeobj is', datetimeobj)
         return (datetimeobj, datetimeobj)
     result = re.search(months, text, re.IGNORECASE)
     if result is not None:
-        print 'f'
+        print('f')
         month = result.group(0)
         monthAsNumber = time.strptime(month, '%B').tm_mon
         if month <= pagedate.month:
@@ -610,19 +610,19 @@ def getDatesFromText(text, pagedate):
         return (datetimeobj, datetimeobj)
     result = re.search('(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)', text, re.IGNORECASE)
     if result is not None:
-        print 'g'
+        print('g')
         day = result.group(0)
         dayAsNumber = time.strptime(day, '%A').tm_mday
         datetimeobj = datetime(pagedate.year, pagedate.month, dayAsNumber)
         return (datetimeobj, datetimeobj)
     result = re.search(year, text, re.IGNORECASE)
     if result is not None:
-        print 'h'
+        print('h')
         date = result.group(0)
         if int(date) > 1900 and int(date) < 3000:
-            print 'date is', date
+            print('date is', date)
             datetimeobj = datetime.strptime(date, '%Y')
-            print 'datetimeobj is', datetimeobj
+            print('datetimeobj is', datetimeobj)
             return (datetimeobj, datetimeobj)
     return (pagedate, pagedate)
 
@@ -639,12 +639,12 @@ def clean(text):
 
 def clean(string):
     if isinstance(string, str):
-        string = unicode(string, encoding="utf-8")
+        string = str(string, encoding="utf-8")
     # NavigableString is an instance of unicode, so no need to convert to byte str
     elif isinstance(string, NavigableString):
-        string = unicode(string)
+        string = str(string)
    
-    replaced = string.replace(u"“", u"\"").replace(u"’", u"'").replace(u"”", u"\"").replace(u"”", u"\"").replace(u"—", u"-").replace(u"&apos;", u"'").strip(u"]").strip(u"[").replace(u"\xc2\xa0", u" ").replace(u"\xa0", u" ").replace(u"\u0194", u'a').replace(u"‘",u"'").replace(u"…",u"...")
+    replaced = string.replace("“", "\"").replace("’", "'").replace("”", "\"").replace("”", "\"").replace("—", "-").replace("&apos;", "'").strip("]").strip("[").replace("\xc2\xa0", " ").replace("\xa0", " ").replace("\u0194", 'a').replace("‘","'").replace("…","...")
 
     # remove anything between comments
     replaced = sub("\/\*{0,5}.*\*\/", " ", replaced)
@@ -666,7 +666,7 @@ def clean(string):
     #strip all starting and trailing white space
     while True:
         old_length = len(replaced)
-        replaced = replaced.strip().strip(u"\xc2").strip(u"\xa0").strip()
+        replaced = replaced.strip().strip("\xc2").strip("\xa0").strip()
         new_length = len(replaced)
         if new_length == old_length:
             break
@@ -677,7 +677,7 @@ def clean(string):
 
 def pos_tag(tokens):
     tagged = nltk.pos_tag(tokens)
-    print "tagged is", type(tagged)
+    print("tagged is", type(tagged))
     retagged = []
 
     # tag indirect speech verbs
@@ -741,16 +741,16 @@ def getStatementsFromText(text, language=None):
 
     
 def getStatementsFromTextEnglish(text):
-    print "starting getStatementsFromText with", type(text)
-    print text
+    print("starting getStatementsFromText with", type(text))
+    print(text)
     text = clean(text)
-    print "text after clean is", text
+    print("text after clean is", text)
 #    paragraphs = text.split(u"\n\n")
 #    print "paragraphs are", len(paragraphs)
     tokens = nltk.word_tokenize(text)
-    print "tokens are", tokens
+    print("tokens are", tokens)
     tagged = pos_tag(tokens)
-    print "tagged is", tagged
+    print("tagged is", tagged)
     statements = []
     grammar = """
               Colon: {<:>}
@@ -817,7 +817,7 @@ def getStatementsFromTextEnglish(text):
  
     cp = nltk.RegexpParser(grammar)
     result = cp.parse(tagged)
-    print "result is", type(result)
+    print("result is", type(result))
 
 #    grammar = nltk.data.load("file:bgrammar.cfg")
 #    grammar = nltk.CFG.fromstring("""
@@ -843,25 +843,25 @@ def getStatementsFromTextEnglish(text):
         if len(subjects) > 0:
             subject = subjects[0] 
             speakers = getPartOfTree(subject, "NNPS")
-            print "speakers are", speakers
+            print("speakers are", speakers)
             if len(speakers) > 0:
                 speaker = treeToString(speakers[0])
                 objects = getPartOfTree(clause, "ObjectQ")
                 if len(objects) > 0:
                     obj = objects[0]
                     quotes = getPartOfTree(obj, "Quote")
-                    print "quotes are", quotes
+                    print("quotes are", quotes)
                     if len(quotes) >= 0:
                         quote = treeToString(quotes[0])
                         statements.append({'speaker': speaker, 'quote': quote})
 
-    print"\n\nstatements are", statements
+    print("\n\nstatements are", statements)
     return statements
 
 def getProperNounsFromText(text):
-    print "starting getProperNounsFromText"
+    print("starting getProperNounsFromText")
     text = clean(text)
-    print "text is", text
+    print("text is", text)
     tokens = nltk.word_tokenize(text)
     tagged = pos_tag(tokens)
     properNouns = []
@@ -946,7 +946,7 @@ def get_info_from_match_group(m):
 def getLocationsAndDatesFromEnglishText(text):
     global dictionary
     if not dictionary:
-        print "if first time calling, initialize demonym dict"
+        print("if first time calling, initialize demonym dict")
         with open(os.path.dirname(os.path.abspath(__file__)) + "/data/demonyms.txt","r") as f:
             for line in f:
                 words = line.strip().split(",")
@@ -963,34 +963,34 @@ def getLocationsAndDatesFromEnglishText(text):
     results = []
 
     # location after keyword
-    for m in finditer(ur"(?:(?:[^A-Za-z]|^)(?:cross the|in|entered|into|outside of|from|eastern|western|northern|southern|reached|countries|leaving|to) )((?:[A-Z][a-z]+)(?: [A-Z][a-z]+)?)", text, MULTILINE):
+    for m in finditer(r"(?:(?:[^A-Za-z]|^)(?:cross the|in|entered|into|outside of|from|eastern|western|northern|southern|reached|countries|leaving|to) )((?:[A-Z][a-z]+)(?: [A-Z][a-z]+)?)", text, MULTILINE):
         result = get_info_from_match_group(m)
         if result:
             results.append(result)
         
     # keyword after country as name or acronym
-    for m in finditer(ur"([A-Z][a-z]+|[A-Z]{2,}) (?:city|county|province)", text, MULTILINE):
+    for m in finditer(r"([A-Z][a-z]+|[A-Z]{2,}) (?:city|county|province)", text, MULTILINE):
         result = get_info_from_match_group(m)
         if result:
             results.append(result)
  
 
     # keyword after country as name or acronym
-    for m in finditer(ur"([A-Z][a-z]+|[A-Z]{2,})'s (?:border|prime minister|southern|western|northern|eastern|defense minister)", text, MULTILINE):
+    for m in finditer(r"([A-Z][a-z]+|[A-Z]{2,})'s (?:border|prime minister|southern|western|northern|eastern|defense minister)", text, MULTILINE):
         result = get_info_from_match_group(m)
         if result:
             results.append(result)
 
 
     # Greece-Macedonia border
-    for m in finditer(ur"([A-Z][a-z]+)-([A-Z][a-z]+) border", text, MULTILINE):
+    for m in finditer(r"([A-Z][a-z]+)-([A-Z][a-z]+) border", text, MULTILINE):
         result = get_info_from_match_group(m)
         if result:
             results.append(result)
 
 
     #countries, especially/like/ Italy, Greece and Hungary.
-    for m in finditer(ur"(?:countries|nations|places), [a-z]+ ([A-Z][a-z]+), ([A-Z][a-z]+) and ([A-Z][a-z]+)", text, MULTILINE):
+    for m in finditer(r"(?:countries|nations|places), [a-z]+ ([A-Z][a-z]+), ([A-Z][a-z]+) and ([A-Z][a-z]+)", text, MULTILINE):
         result = get_info_from_match_group(m)
         if result:
             results.append(result)
@@ -998,7 +998,7 @@ def getLocationsAndDatesFromEnglishText(text):
 
 
     #islands of Kos, Chios, Lesvos and Samos 
-    for m in finditer(ur"(?:countries|islands|nations|places|states) of ([A-Z][a-z]+), ([A-Z][a-z]+), ([A-Z][a-z]+)+ and ([A-Z][a-z]+)", text, MULTILINE):
+    for m in finditer(r"(?:countries|islands|nations|places|states) of ([A-Z][a-z]+), ([A-Z][a-z]+), ([A-Z][a-z]+)+ and ([A-Z][a-z]+)", text, MULTILINE):
         result = get_info_from_match_group(m)
         if result:
             results.append(result)
@@ -1007,7 +1007,7 @@ def getLocationsAndDatesFromEnglishText(text):
 
     #ignore demonyms for now, because accuracy is not that high
     #Eritreans, Syrian
-    for m in finditer(ur"([A-Z][a-z]{3,}ans?)", text, MULTILINE):
+    for m in finditer(r"([A-Z][a-z]{3,}ans?)", text, MULTILINE):
         demonym = m.group(0)
         if demonym in dictionary:
             country = dictionary[demonym]
@@ -1021,12 +1021,12 @@ def getLocationsAndDatesFromEnglishText(text):
     locations = [result['location'] for result in results]
 
     #see: http://stackoverflow.com/questions/21720199/python-remove-any-element-from-a-list-of-strings-that-is-a-substring-of-anothe
-    locations_verbose = filter(lambda x: [x for i in locations if x in i and x != i] == [], locations)
+    locations_verbose = [x for x in locations if [x for i in locations if x in i and x != i] == []]
     for result in results:
         location = result['location']
         for location_verbose in locations_verbose:
             if not location == location_verbose and location in location_verbose:
-                print "changing " + location + " to " + location_verbose
+                print("changing " + location + " to " + location_verbose)
                 result['location'] = location_verbose
 
     grouped_by_hash = {}
@@ -1039,7 +1039,7 @@ def getLocationsAndDatesFromEnglishText(text):
         else:
             grouped_by_hash[h] = {'context': result['context'], 'date': result['date'], 'location': result['location']}
 
-    results = grouped_by_hash.values()
+    results = list(grouped_by_hash.values())
 
     return results
 x = getLocationsAndDatesFromEnglishText

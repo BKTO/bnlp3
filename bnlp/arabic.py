@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-import __init__
+from . import __init__
 import nltk
 from os.path import abspath, dirname
 import re
@@ -23,7 +23,7 @@ def cleanOrg(text):
         text = text.decode("utf-8")
 
     #remove diacritics
-    text = text.rstrip(u'\xbb')
+    text = text.rstrip('\xbb')
 
     return text
 
@@ -36,11 +36,11 @@ def getLocationsFromText(text):
     locations = []
 
     d = {}
-    d[u'\u062c\u0646\u0648\u0628'] = "ganub/south"
-    d[u'\u0634\u0645\u0627\u0644'] = "shemel/north"
-    d[u'\u0627\u0644\u0634\u0631\u0642'] = "sharq/east"
-    d[u'\u063a\u0631\u0628'] = "gharb/west"
-    for result in  finditer(ur"(?P<keyword>\u062c\u0646\u0648\u0628|\u0634\u0645\u0627\u0644|\u0627\u0644\u0634\u0631\u0642|\u063a\u0631\u0628) (?P<location>[^ .,]*)", clean(text), MULTILINE):
+    d['\u062c\u0646\u0648\u0628'] = "ganub/south"
+    d['\u0634\u0645\u0627\u0644'] = "shemel/north"
+    d['\u0627\u0644\u0634\u0631\u0642'] = "sharq/east"
+    d['\u063a\u0631\u0628'] = "gharb/west"
+    for result in  finditer(r"(?P<keyword>\u062c\u0646\u0648\u0628|\u0634\u0645\u0627\u0644|\u0627\u0644\u0634\u0631\u0642|\u063a\u0631\u0628) (?P<location>[^ .,]*)", clean(text), MULTILINE):
         locations.append(result.group("location"))
 
     return locations
@@ -48,18 +48,18 @@ def getLocationsFromText(text):
 def getPeopleFromText(text):
     people = []
     d = {}
-    d[u'\u0639\u0645\u0629'] = "3ma/aunt(f)"
+    d['\u0639\u0645\u0629'] = "3ma/aunt(f)"
 
-    d[u'\u0645\u062f\u064a\u0631'] = "mudeer/boss"
+    d['\u0645\u062f\u064a\u0631'] = "mudeer/boss"
     #split matches like aunt of khaled into aunt of khaled and khaled
 
     text = clean(text)
 
-    for result in finditer(ur"(?P<keyword>\u0639\u0645\u0629) (?P<person>[^ .,]*)", text, MULTILINE):
+    for result in finditer(r"(?P<keyword>\u0639\u0645\u0629) (?P<person>[^ .,]*)", text, MULTILINE):
         people.append(result.group("person"))
 
     #director al... al... fee al.... b.... (name) 
-    for result in finditer(ur"(?P<position>(?:\u0645\u062f\u064a\u0631)(?: (?:(?:\u0627\u0644[^ .,]*)|\u0641\u064a|(?:\u0628[^ .,]*)))*) \((?P<person>[^\)]*)\)", text, MULTILINE):
+    for result in finditer(r"(?P<position>(?:\u0645\u062f\u064a\u0631)(?: (?:(?:\u0627\u0644[^ .,]*)|\u0641\u064a|(?:\u0628[^ .,]*)))*) \((?P<person>[^\)]*)\)", text, MULTILINE):
         people.append(result.group("person"))
 
     for result in finditer("^[\"'](?P<person>[^\"']*)[\"']: ?(?P<statement>[^\.\n$]*)$", text, MULTILINE):
@@ -74,8 +74,8 @@ def getPeopleFromText(text):
 def getPositionsFromText(text):
     positions = []
     d = {}
-    d[u'\u0645\u062f\u064a\u0631'] = "mudeer/boss"
-    for result in finditer(ur"(?<position>(?:\u0645\u062f\u064a\u0631)(?: (?:(?:\u0641\u064a)|(?:\u0627\u0644[^ .,]*)))*)", clean(text), MULTILINE):
+    d['\u0645\u062f\u064a\u0631'] = "mudeer/boss"
+    for result in finditer(r"(?<position>(?:\u0645\u062f\u064a\u0631)(?: (?:(?:\u0641\u064a)|(?:\u0627\u0644[^ .,]*)))*)", clean(text), MULTILINE):
         positions.append(result.group("position"))
 
     return positions 
@@ -83,29 +83,29 @@ def getPositionsFromText(text):
 
 
 dictionary = {}
-dictionary['\u0627\u0644\u0623\u062B\u0646\u064A\u0646'] = "AlIthnayn/Monday"
-dictionary['\u060c'] = "reverse/arabic comma"
+dictionary['\\u0627\\u0644\\u0623\\u062B\\u0646\\u064A\\u0646'] = "AlIthnayn/Monday"
+dictionary['\\u060c'] = "reverse/arabic comma"
 
 
 def getOrgsFromTextArabic(text):
 
     """
     d = {}
-    d[u'\u0627\u0644\u062c\u0645\u0639\u064a\u0629']= "jamiaee/association"
-    d[u'\u062c\u0628\u0647\u0629'] = 'jabhat/front'
-    d[u'\u0645\u0646\u0638\u0645\u0629'] = 'mnthama/organization'
-    d[u'\u0648\u0632\u0627\u0631\u0629'] = 'wzara/ministry'
-    d[u'\u062c\u064a\u0634'] = 'jaysh/army'
-    d[u'\u0644\u0648\u0627\u0621'] = 'liwa/brigade'
-    d[u'\u0647\u064a\u0626\u0629'] = "hayat/body/shields"
-    d[u'\u0643\u062a\u0627\u0626\u0628'] = "kitaeb/brigades"
-    d[u'\u0623\u0646\u0635\u0627\u0631'] = "ansar/supporters"
-    d[u'\u062d\u0631\u0643\u0629'] = "harakat/movement"
-    d[u'\u0641\u064a\u0644\u0642'] = 'felaq/legion'
-    d[u'\u0627\u0644\u0625\u062e\u0648\u0627\u0646'] = "alikhwan/brotherhood"
-    d[u'\u062d\u0632\u0628'] = "hezb/party"
-    d[u'\u063a\u0631\u0628\u0627\u0621'] = "ghuraba/strangers/foreigners"
-    orgs = list(set(findall(ur"(?:(?:\u063a\u0631\u0628\u0627\u0621|\u062d\u0632\u0628|\u0627\u0644\u0625\u062e\u0648\u0627\u0646|\u0641\u064a\u0644\u0642|\u062d\u0631\u0643\u0629|\u0643\u062a\u0627\u0626\u0628|\u0643\u062a\u0627\u0626\u0628|\u0647\u064a\u0626\u0629|\u0644\u0648\u0627\u0621|\u062c\u064a\u0634|\u0627\u0644\u062c\u0645\u0639\u064a\u0629|\u062c\u0628\u0647\u0629|\u0645\u0646\u0638\u0645\u0629|\u0648\u0632\u0627\u0631\u0629)(?: (?:(?:\u0627\u0644[^ .,\u060ci\n\r]*)|\u0641\u064a|(?:\u0628[^ .,\u060c\n\r]*)))+)", text, MULTILINE)))
+    d[u'\\u0627\\u0644\\u062c\\u0645\\u0639\\u064a\\u0629']= "jamiaee/association"
+    d[u'\\u062c\\u0628\\u0647\\u0629'] = 'jabhat/front'
+    d[u'\\u0645\\u0646\\u0638\\u0645\\u0629'] = 'mnthama/organization'
+    d[u'\\u0648\\u0632\\u0627\\u0631\\u0629'] = 'wzara/ministry'
+    d[u'\\u062c\\u064a\\u0634'] = 'jaysh/army'
+    d[u'\\u0644\\u0648\\u0627\\u0621'] = 'liwa/brigade'
+    d[u'\\u0647\\u064a\\u0626\\u0629'] = "hayat/body/shields"
+    d[u'\\u0643\\u062a\\u0627\\u0626\\u0628'] = "kitaeb/brigades"
+    d[u'\\u0623\\u0646\\u0635\\u0627\\u0631'] = "ansar/supporters"
+    d[u'\\u062d\\u0631\\u0643\\u0629'] = "harakat/movement"
+    d[u'\\u0641\\u064a\\u0644\\u0642'] = 'felaq/legion'
+    d[u'\\u0627\\u0644\\u0625\\u062e\\u0648\\u0627\\u0646'] = "alikhwan/brotherhood"
+    d[u'\\u062d\\u0632\\u0628'] = "hezb/party"
+    d[u'\\u063a\\u0631\\u0628\\u0627\\u0621'] = "ghuraba/strangers/foreigners"
+    orgs = list(set(findall(ur"(?:(?:\\u063a\\u0631\\u0628\\u0627\\u0621|\\u062d\\u0632\\u0628|\\u0627\\u0644\\u0625\\u062e\\u0648\\u0627\\u0646|\\u0641\\u064a\\u0644\\u0642|\\u062d\\u0631\\u0643\\u0629|\\u0643\\u062a\\u0627\\u0626\\u0628|\\u0643\\u062a\\u0627\\u0626\\u0628|\\u0647\\u064a\\u0626\\u0629|\\u0644\\u0648\\u0627\\u0621|\\u062c\\u064a\\u0634|\\u0627\\u0644\\u062c\\u0645\\u0639\\u064a\\u0629|\\u062c\\u0628\\u0647\\u0629|\\u0645\\u0646\\u0638\\u0645\\u0629|\\u0648\\u0632\\u0627\\u0631\\u0629)(?: (?:(?:\\u0627\\u0644[^ .,\\u060ci\n\r]*)|\\u0641\\u064a|(?:\\u0628[^ .,\\u060c\n\r]*)))+)", text, MULTILINE)))
     """
     global keywords_orgs
     loadOrgKeywordsIfNecessary()
@@ -113,8 +113,8 @@ def getOrgsFromTextArabic(text):
     if isinstance(text, str):
         text = text.decode('utf-8')
 
-    keyword_pattern = u"(?:" + u"|".join(keywords_orgs) + u")"
-    pattern = u"(?:" + keyword_pattern + u"(?: (?:(?:\u0627\u0644[^ .,\u060c\n\r<\"]*)|\u0641\u064a|(?:\u0628[^ .,\u060c\n\r<\"]*)))+)"
+    keyword_pattern = "(?:" + "|".join(keywords_orgs) + ")"
+    pattern = "(?:" + keyword_pattern + "(?: (?:(?:\u0627\u0644[^ .,\u060c\n\r<\"]*)|\u0641\u064a|(?:\u0628[^ .,\u060c\n\r<\"]*)))+)"
     comp = re_compile(pattern, MULTILINE|UNICODE)
     found = findall(comp, text)
     found = [cleanOrg(f) for f in found]
@@ -124,7 +124,7 @@ def getOrgsFromTextArabic(text):
     orgsAsDictionary = {}
     for org in orgs:
         added = False
-        for key in orgsAsDictionary.keys():
+        for key in list(orgsAsDictionary.keys()):
             if org in key:
                 orgsAsDictionary[key]['aliases'].append(org)
                 added = True
