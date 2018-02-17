@@ -5,7 +5,7 @@ setup(
   packages = ['bnlp3'],
   package_dir = {'bnlp3': 'bnlp3'},
   package_data = {'bnlp3': ['*']},
-  version = '0.6',
+  version = '0.7',
   description = 'Better Natural Language Processing, a collection of open source nlp methods used by Better Know The Opposition',
   author = 'Better Know The Opposition',
   author_email = 'hello@betterknowtheopposition.com',
