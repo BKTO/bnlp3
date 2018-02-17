@@ -1,6 +1,5 @@
 from re import findall, finditer, IGNORECASE, MULTILINE, search, sub
-import bdates, os
-from bdates import extract_dates
+import os
 
 global dictionary
 dictionary = {}
