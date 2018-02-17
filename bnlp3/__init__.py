@@ -158,7 +158,7 @@ def getKeywordsFromString(string):
         string_replaced = string.replace("\"","").replace(".  ", ". ").replace("'s "," ") 
 #        print "\treplaced is ", string_replaced
         acronyms = re.findall(r"[A-Z]{2,}", string_replaced)
-	titled = re.findall(r"(?<!\.\s)[A-Z][a-z]{2,}(?:\s[A-Z][a-z]{2,})*", string_replaced)
+        titled = re.findall(r"(?<!\.\s)[A-Z][a-z]{2,}(?:\s[A-Z][a-z]{2,})*", string_replaced)
         keywords = list(set(acronyms + titled))
     else:
         keywords = []
